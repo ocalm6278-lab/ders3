@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YKS Yapay Zeka Tam Hafta Sayısal Savaş Üssü V46</title>
+    <style>
+        :root {
+            --bg-color: #121214;
+            --card-bg: #1a1a1e;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --ai-color: #a855f7;
+            --ai-hover: #9333ea;
+            --text: #e4e4e7;
+            --text-muted: #a1a1aa;
+            --border: #27272a;
+            --success: #22c55e;
+            --warning: #eab308;
+            --month-color: #0ea5e9;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-color); color: var(--text); padding: 20px; display: flex; justify-content: center; }
+        
+        .container {
+            width: 100%;
+            max-width: 1650px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) { .container { grid-template-columns: 1fr; } }
+
+        .card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .card-header-toggle {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        h2, h3 { color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
+        .ai-title { border-left-color: var(--ai-color); }
+        .section-divider { color: var(--warning); border-left-color: var(--warning); margin-top: 15px; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px; padding-left: 10px; }
+
+        .toggle-icon { font-size: 1.2rem; color: var(--text-muted); transition: transform 0.2s; }
+        .collapsible-content { margin-top: 15px; }
+
+        .btn {
+            background-color: var(--primary); color: white; border: none; padding: 10px 20px;
+            font-size: 1rem; border-radius: 6px; cursor: pointer; transition: 0.2s; margin: 5px 2px;
+        }
+        .btn:hover { background-color: var(--primary-hover); }
+        .btn-ai { background-color: var(--ai-color); font-weight: bold; }
+        .btn-ai:hover { background-color: var(--ai-hover); }
+        .btn-secondary { background-color: #3f3f46; }
+        .btn-secondary:hover { background-color: #52525b; }
+        .btn-danger { background-color: var(--danger); }
+        .btn-success { background-color: var(--success); }
+        .btn-warning { background-color: var(--warning); color: #000; }
+
+        .display { font-size: 3rem; font-weight: bold; font-family: monospace; text-align: center; margin: 15px 0; color: var(--primary); }
+        .timer-actions { margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--border); display: flex; flex-wrap: wrap; gap: 15px; justify-content: center; align-items: center; }
+        
+        input, select, textarea { background-color: #1a1a1e; border: 1px solid var(--border); color: white; padding: 10px; border-radius: 6px; outline: none; }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        .api-manager-box {
+            display: flex; gap: 10px; align-items: center; background-color: #222226; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px dashed #3f3f46;
+        }
+
+        .level-progress-container { margin: 8px 0; background: #27272a; border-radius: 8px; overflow: hidden; border: 1px solid var(--border); }
+        .level-progress-bar { width: 0%; height: 18px; background: linear-gradient(90deg, var(--primary), var(--ai-color)); transition: width 0.5s ease; }
+        .level-progress-bar.ayt-bar { background: linear-gradient(90deg, #0ea5e9, #a855f7); }
+        .level-status-text { display: flex; justify-content: space-between; font-size: 0.85rem; margin-top: 3px; color: var(--text-muted); margin-bottom: 10px; }
+
+        .subjects-panel { max-height: 98vh; overflow-y: auto; position: sticky; top: 20px; }
+        .subject-category { margin-bottom: 12px; }
+        
+        .tyt-cate-title { background-color: #27272a !important; border-left: 4px solid #0ea5e9 !important; padding: 10px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.95rem; color: #fff !important; }
+        .tyt-cate-title:hover { background-color: #3f3f46 !important; }
+        
+        .ayt-cate-title { background-color: #27272a !important; border-left: 4px solid #a855f7 !important; padding: 10px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; display: flex; justify-content: space-between; font-size: 0.95rem; color: #fff !important; }
+        .ayt-cate-title:hover { background-color: #3f3f46 !important; }
+
+        .sub-list { padding-left: 15px; margin-top: 8px; }
+        .sub-item { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; font-size: 0.9rem; }
+
+        .log-table, .schedule-table { width: 100%; border-collapse: collapse; margin-top: 10px; margin-bottom: 20px; }
+        .log-table th, .log-table td, .schedule-table th, .schedule-table td { border: 1px solid var(--border); padding: 12px; text-align: left; }
+        
+        .schedule-table th { background-color: #27272a; color: #f59e0b; font-size: 1.15rem; font-weight: bold; text-align: center; }
+        .schedule-table th:first-child { width: 15%; background-color: #312e81; color: white; font-size: 0.95rem; }
+        
+        .month-tabs, .week-tabs { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 12px; margin-bottom: 8px; }
+        .month-btn, .week-btn { background-color: #27272a; color: var(--text-muted); border: 1px solid var(--border); padding: 8px 14px; border-radius: 6px; cursor: pointer; font-size: 0.88rem; font-weight: bold; transition: 0.2s; }
+        .month-btn:hover, .week-btn:hover { background-color: #3f3f46; color: white; }
+        .month-btn.active { background-color: var(--month-color); color: white; border-color: var(--month-color); }
+        .week-btn.active { background-color: var(--primary); color: white; border-color: var(--primary); }
+
+        .log-form-premium { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; background: #222226; padding: 20px; border-radius: 10px; border: 1px solid #3f3f46; margin-top: 15px; }
+        .log-form-premium .form-row { display: flex; flex-direction: column; gap: 6px; }
+        .log-form-premium label { font-size: 0.85rem; color: var(--warning) !important; font-weight: bold; text-transform: uppercase; letter-spacing: 0.5px; }
+        .log-form-premium select, .log-form-premium input { background-color: #1a1a1e !important; border: 1px solid #3f3f46 !important; color: #ffffff !important; padding: 12px !important; font-size: 0.95rem !important; border-radius: 8px !important; width: 100% !important; }
+
+        .book-config-form { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 15px; background: #1e293b; padding: 15px; border-radius: 8px; border: 1px solid #0284c7; align-items: center; }
+        .book-config-form select { padding: 8px; font-size: 0.9rem; }
+        .book-tabs { display: flex; gap: 5px; margin-bottom: 10px; }
+        .book-tab-btn { background-color: #27272a; color: var(--text-muted); border: 1px solid var(--border); padding: 6px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .book-tab-btn.active { background-color: #0284c7; color: white; border-color: #0284c7; }
+
+        .schedule-table td { background-color: #1e1e24; height: 85px; vertical-align: middle; width: 12%; }
+        .schedule-table td:first-child { background-color: #27272a; font-weight: bold; color: var(--warning); text-align: center; font-size: 0.85rem; }
+        .schedule-cell-content { min-height: 65px; font-size: 0.85rem; color: #f3e8ff; white-space: pre-wrap; outline: none; padding: 6px; border-radius: 4px; line-height: 1.4; }
+
+        .ai-response-box { background-color: #1a1a24; border: 1px solid var(--border); padding: 20px; border-radius: 10px; margin-top: 15px; min-height: 100px; color: #e4e4e7; line-height: 1.8; font-size: 0.98rem; }
+
+        .finished-sources-box, .sport-config-box { background: #222226; border: 1px solid #3f3f46; padding: 12px; border-radius: 8px; margin-top: 15px; }
+        .sport-config-box span { color: var(--warning) !important; font-weight: bold; }
+        .source-item { background: #27273a; border-left: 3px solid #6366f1; padding: 8px 12px; margin-top: 6px; border-radius: 4px; font-size: 0.85rem; display: flex; justify-content: space-between; align-items: center; }
+        .source-books-list { color: var(--warning); font-weight: 600; margin-left: 4px; }
+
+        select, input[type="text"], input[type="number"], input[type="password"] { background-color: #1a1a1e !important; border: 1px solid #3f3f46 !important; color: #ffffff !important; outline: none !important; }
+        .station-box { background-color: #222226; border: 1px solid var(--border); padding: 12px; border-radius: 8px; margin-top: 10px; }
+        .station-form-group { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; align-items: center; }
+        .book-trigger-area { display: flex; align-items: center; justify-content: space-between; background: #10b981; padding: 12px 20px; border-radius: 8px; color: white; font-weight: bold; font-size: 1rem; }
+
+        .work-hours-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 12px; text-align: center; }
+        .work-day-box { background: #27272a; padding: 8px 4px; border-radius: 6px; border: 1px solid #3f3f46; }
+        .work-day-box .day-title { font-size: 0.75rem; color: var(--warning); font-weight: bold; display: block; }
+        .work-day-box .day-val { font-size: 0.95rem; color: #fff; font-weight: bold; margin-top: 4px; display: block; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    
+    <!-- SOL TARAF -->
+    <div class="main-content">
+        
+        <!-- Geri Sayım Sayacı & Canlı Süre Analizi -->
+        <div class="card" style="text-align:center;">
+            <h2>Çalışma Masası & Geri Sayım Sayacı</h2>
+            <div class="display" id="timerDisplay">00:00:00</div>
+            
+            <div style="display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 10px;">
+                <button class="btn btn-success" id="startBtn">Başlat</button>
+                <button class="btn btn-warning" id="pauseBtn" style="display:none;">Durdur</button>
+                
+                <div style="display: inline-flex; gap: 4px; align-items: center; background: #1e293b; padding: 2px 6px; border-radius: 8px; border: 1px solid #3b82f6;">
+                    <span style="font-size: 0.8rem; color: #93c5fd; font-weight: bold;">Gün:</span>
+                    <select id="timerTargetDaySelect" style="padding: 6px; font-size: 0.85rem; border: none !important;">
+                        <option value="pazartesi">Pazartesi</option>
+                        <option value="sali">Salı</option>
+                        <option value="carsamba">Çarşamba</option>
+                        <option value="persembe">Perşembe</option>
+                        <option value="cuma">Cuma</option>
+                        <option value="cumartesi">Cumartesi</option>
+                        <option value="pazar">Pazar</option>
+                    </select>
+                    <button class="btn btn-ai" id="finishBtn" style="background-color: #3b82f6; font-size: 0.9rem; padding: 8px 12px; margin: 0;" onclick="finishSessionAndLog()">🏁 Dersi Bitir & Kaydet</button>
+                </div>
+
+                <button class="btn btn-danger" id="resetBtn">Sıfırla</button>
+            </div>
+            
+            <div class="timer-actions">
+                <div class="manual-input-group">
+                    <span>Ders Süresi Kur (Dk):</span>
+                    <input type="number" id="manualMinutes" min="1" placeholder="Örn: 120" style="width: 80px;">
+                    <button class="btn btn-success" id="addManualBtn" style="padding: 5px 12px; font-weight: bold;">Süreyi Kur</button>
+                </div>
+                <div>
+                    <span>Mola:</span>
+                    <button class="btn var(--warning)" style="background-color: var(--warning); color: #000;" onclick="startMola(5)">5 dk</button>
+                    <button class="btn var(--warning)" style="background-color: var(--warning); color: #000;" onclick="startMola(10)">10 dk</button>
+                    <button class="btn var(--warning)" style="background-color: var(--warning); color: #000;" onclick="startMola(15)">15 dk</button>
+                    <button class="btn var(--warning)" style="background-color: var(--warning); color: #000;" onclick="startMola(20)">20 dk</button>
+                </div>
+            </div>
+
+            <!-- 📊 HAFTALIK ÇALIŞMA SÜRELERİ ANALİZ KUTUSU -->
+            <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border); text-align: left;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h3 style="font-size: 1rem; border-left-color: var(--month-color); color: var(--month-color);">📊 Canlı Günlük & Haftalık Çalışma Sürelerin</h3>
+                    
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <select id="statsMonthSelect" onchange="updateStatsFilter()" style="padding: 4px 8px; font-size: 0.85rem;"></select>
+                        <select id="statsWeekSelect" onchange="updateStatsFilter()" style="padding: 4px 8px; font-size: 0.85rem;">
+                            <option value="1">1. Hafta</option>
+                            <option value="2">2. Hafta</option>
+                            <option value="3">3. Hafta</option>
+                            <option value="4">4. Hafta</option>
+                        </select>
+                        <span id="weeklyTotalHoursBadge" style="background: var(--month-color); color: white; padding: 4px 10px; border-radius: 12px; font-weight: bold; font-size: 0.85rem;">Haftalık: 0 S 0 Dk</span>
+                    </div>
+                </div>
+
+                <div class="work-hours-grid">
+                    <div class="work-day-box"><span class="day-title">PZT</span><span class="day-val" id="wh-pazartesi">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">SALI</span><span class="day-val" id="wh-sali">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">ÇAR</span><span class="day-val" id="wh-carsamba">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">PRŞ</span><span class="day-val" id="wh-persembe">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">CUMA</span><span class="day-val" id="wh-cuma">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">CMT</span><span class="day-val" id="wh-cumartesi">0 Dk</span></div>
+                    <div class="work-day-box"><span class="day-title">PZR</span><span class="day-val" id="wh-pazar">0 Dk</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- DERS ARASI MOLA EGZERSİZLERİ -->
+        <div class="card" style="border-color: #f43f5e; background: #4c0519;">
+            <div class="card-header-toggle" onclick="toggleCardContent('exerciseCollapse', 'exerciseIcon')">
+                <h2 style="color: #fff1f2;">🧘‍♂️ Ders Arası Aktif Dinlenme & Egzersiz Havuzu</h2>
+                <span class="toggle-icon" id="exerciseIcon">▼</span>
+            </div>
+            <div class="collapsible-content" id="exerciseCollapse" style="display: none;">
+                <p style="color: #fecdd3; font-size: 0.9rem; margin-bottom: 12px;">Hareketi listeden seç, yönergeyi oku ve sayacı başlat şampiyon!</p>
+                <div class="station-form-group">
+                    <select id="exerciseSelect" onchange="updateExerciseDescription()" style="width: 100%; padding: 8px; font-size: 0.9rem; background: #27272a; border-color: #f43f5e;">
+                        <option value="0">🥊 Boksör Gölge Boksu (Hafif Tempo Zihni Açar)</option>
+                        <option value="1">👀 Göz Odaklama Jimnastiği (Ekran Yorgunluğunu Siler)</option>
+                        <option value="2">🧘 Boyun Lateral Germe (Masa Sertliğini Yok Et)</option>
+                        <option value="3">👐 El Bileği Döndürme ve Parmak Açma</option>
+                        <option value="4">🏃‍♂️ Oturduğun Yerde Diz Çekme (Kan Akışı)</option>
+                        <option value="5">💪 Shoulder Roll (Omuz Yuvarlama Hareketi)</option>
+                        <option value="6">🩺 Derin Torasik Nefes Alışverişi</option>
+                        <option value="7">🧗‍♂️ Masa Kenarı Hafif Şınav (Kas Aktivasyonu)</option>
+                        <option value="8">🦵 Oturarak Arka Bacak (Hamstring) Esnetme</option>
+                        <option value="9">🧘 Torakal Omurga Rotasyonu (Sırt Çıtlatma)</option>
+                        <option value="10">🤸‍♂️ Kedi-Deve Esnetmesi (Sandalyede Dikleşme)</option>
+                    </select>
+                </div>
+                <div id="exerciseDescBox" style="background: #2d0612; border-left: 4px solid #f43f5e; padding: 12px; margin: 10px 0; font-size: 0.92rem; color: #ffe4e6; text-align: left; line-height: 1.5;"></div>
+                <div class="display" id="exerciseDisplay" style="color: #f43f5e; font-size: 2.5rem; margin: 10px 0;">03:00</div>
+                <div style="display: flex; justify-content: center; gap: 8px;">
+                    <button class="btn" style="background-color: #f43f5e; font-weight: bold;" onclick="startExerciseTimer()">Egzersizi Başlat (3 Dk)</button>
+                    <button class="btn btn-secondary" onclick="resetExerciseTimer()">Sıfırla</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📚 YKS AI HAFTALIK EDEBİ KİTAP KULÜBÜ MODÜLÜ -->
+        <div class="card" style="border-color: #10b981; background: #064e3b;">
+            <div class="card-header-toggle" onclick="toggleCardContent('novelCollapse', 'novelIcon')">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <h2 style="border-left-color: #10b981; color: #ecfdf5;">📚 Epik & Fantastik Kitap Kulübü</h2>
+                    <span id="finishedNovelsCounterBadge" style="background: #10b981; border: 1px solid #a7f3d0; color: white; font-weight: bold; padding: 2px 8px; border-radius: 20px; font-size: 0.8rem;">Biten Eser: 0</span>
+                </div>
+                <span class="toggle-icon" id="novelIcon">▼</span>
+            </div>
+            <div class="collapsible-content" id="novelCollapse" style="display: none;">
+                <p style="color: #a7f3d0; font-size: 0.88rem; margin-bottom: 12px;">Game of Thrones, Yüzüklerin Efendisi, Malazan... Devasa evrenler seni bekliyor kral!</p>
+                <div class="book-trigger-area" style="margin-bottom: 10px;">
+                    <button class="btn" style="background: none; padding: 0; font-weight: bold; color: white;" onclick="runLiveGeminiAI('weekly_novel')">📖 Rastgele 1 Epik Kitap Önerisi Al (Otomatik Yazar)</button>
+                </div>
+
+                <div style="background: #01221a; padding: 12px; border-radius: 8px; border: 1px dashed #10b981; margin-bottom: 12px; display: flex; flex-direction: column; gap: 6px;">
+                    <span style="font-size: 0.82rem; color: #a7f3d0; font-weight: bold;">📖 Şu An Masanda Açık Olan / Okunan Edebi Eser:</span>
+                    <div style="display: flex; gap: 6px;">
+                        <input type="text" id="currentReadingNovelInput" placeholder="Sistemin kitabı otomatik yazmasını bekle veya elle gir..." style="flex: 1; padding: 8px; font-size: 0.85rem;" oninput="saveCurrentNovelState()">
+                        <button class="btn btn-success" style="padding: 6px 12px; font-size: 0.85rem; margin: 0; font-weight: bold;" onclick="markCurrentNovelAsRead()">Okudum!</button>
+                    </div>
+                </div>
+
+                <div class="ai-response-box" id="aiNovelOutput" style="border-color: #10b981; background-color: #01221a; color: #f0fdf4;">Butona bastığında efsanevi evren önerisi buraya düşecek...</div>
+                <div style="font-size: 0.8rem; color: var(--warning); margin-top: 15px; font-weight: bold; border-top: 1px solid #10b981; padding-top: 8px;">🏛️ Okudum & Bitirdim Kitaplığı:</div>
+                <div id="novelItemsContainer" style="margin-top: 6px; max-height: 120px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <!-- AI CANLI MOTİVASYON & KÜLTÜR İSTASYONU -->
+        <div class="card" style="border-color: #eab308; background: #1c1917;">
+            <div class="card-header-toggle" onclick="toggleCardContent('cultureCollapse', 'cultureIcon')">
+                <h2 style="border-left-color: #eab308; color: #f5f5f4;">🧠 AI Canlı Motivasyon & Kültür Üssü</h2>
+                <span class="toggle-icon" id="cultureIcon">▲</span>
+            </div>
+            <div class="collapsible-content" id="cultureCollapse">
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                    <button class="btn btn-warning" style="font-weight: bold;" onclick="runLiveGeminiAI('motivation')">🔥 Koçtan Sert Motivasyon Konuşması Al</button>
+                    <button class="btn btn-success" style="font-weight: bold;" onclick="runLiveGeminiAI('culture')">🌐 Zihin Açıcı Genel Kültür (Sanat, Spor, Bilim)</button>
+                </div>
+                <div class="ai-response-box" id="aiCultureOutput" style="border-color: #eab308; background-color: #1a1513; color: #fafaf9;">Sarsıcı sesleniş buraya düşecek kral...</div>
+            </div>
+        </div>
+
+        <!-- YAPAY ZEKA GÜNCEL SEVİYE ANALİZ PANELİ -->
+        <div class="card" style="border-color: var(--ai-color);">
+            <div class="card-header-toggle" onclick="toggleCardContent('levelCollapse', 'levelIcon')">
+                <h3 class="ai-title" style="color: white;">📊 Canlı YKS Seviye Durumun (Sayısal Müfredat Bazlı)</h3>
+                <span class="toggle-icon" id="levelIcon">▲</span>
+            </div>
+            <div class="collapsible-content" id="levelCollapse">
+                <div>
+                    <span style="font-size:0.85rem; font-weight:bold; color:var(--text-muted);">Canlı TYT Gelişim Seviyen:</span>
+                    <div class="level-progress-container"><div class="level-progress-bar" id="tytLevelBar"></div></div>
+                    <div class="level-status-text"><span id="tytLevelLabel">Hesaplanıyor...</span><span id="tytLevelPercent" style="color:var(--primary); font-weight:bold;">%0</span></div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <span style="font-size:0.85rem; font-weight:bold; color:var(--text-muted);">Canlı AYT Gelişim Seviyen:</span>
+                    <div class="level-progress-container"><div class="level-progress-bar ayt-bar" id="aytLevelBar"></div></div>
+                    <div class="level-status-text"><span id="aytLevelLabel">Hesaplanıyor...</span><span id="aytLevelPercent" style="color:#0ea5e9; font-weight:bold;">%0</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- YAPAY ZEKA HAFTALIK PROGRAM HAZIRLAMA MOTORU -->
+        <div class="card" style="border-color: var(--ai-color); box-shadow: 0 0 15px rgba(168, 85, 247, 0.2);">
+            <div class="card-header-toggle" onclick="toggleCardContent('programaiCollapse', 'programaiIcon')">
+                <h2 class="ai-title">🧠 AI Entegreli Akıllı Program Hazırlama Motoru (2.5)</h2>
+                <span class="toggle-icon" id="programaiIcon">▲</span>
+            </div>
+            <div class="collapsible-content" id="programaiCollapse" style="display: block;">
+                <div class="api-manager-box">
+                    <span style="font-size: 0.9rem; color: var(--text-muted); white-space: nowrap;">Gemini API Key:</span>
+                    <input type="password" id="uiApiKeyInput" placeholder="AIzaSy... anahtarını yapıştır kral" style="flex: 1; padding: 6px 10px; font-size: 0.85rem;">
+                    <button class="btn btn-success" onclick="saveApiKeyToSystem()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0;">Key'i Kaydet</button>
+                    <button class="btn btn-danger" onclick="clearApiKeyFromSystem()" style="padding: 6px 12px; font-size: 0.85rem; margin: 0;">Sil</button>
+                </div>
+                
+                <div style="background: #222226; padding: 12px; border-radius: 8px; border: 1px dashed var(--ai-color); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <span style="font-size: 0.9rem; color: var(--warning); font-weight: bold; white-space: nowrap;">📊 Mevcut Çalışma Kademesi:</span>
+                    <select id="userWorkStage" style="flex: 1; padding: 8px; font-size: 0.9rem; background: #1a1a1e;">
+                        <option value="STAGE_1">1. Aşama: Alışma & Altyapı Fazı (Günlük 4-5 Saat Odaklı)</option>
+                        <option value="STAGE_2" selected>2. Aşama: Gelişim & Yükseliş Fazı (Günlük 6-7 Saat Odaklı)</option>
+                        <option value="STAGE_3">3. Aşama: Canavar & Derece Fazı (Günlük 8-10 Saat Yoğun Yükleme)</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                    <button class="btn btn-ai" style="background: linear-gradient(135deg, #a855f7, #6366f1);" onclick="runLiveGeminiAI('weekly')">⚡ 7 Günlük Tam Sayısal Program Hazırla & Entegre Et</button>
+                </div>
+                <div class="ai-response-box" id="aiOutput" style="border-color: var(--ai-color); font-size: 1.05rem; line-height: 1.8;">Pazartesi'den Pazar'a tüm haftalık sayısal programın buraya akacak...</div>
+            </div>
+        </div>
+
+        <!-- AI SORU HEDEFLEYİCİ PANELİ -->
+        <div class="card" style="border-color: var(--success);">
+            <div class="card-header-toggle" onclick="toggleCardContent('questionCollapse', 'questionIcon')">
+                <h2 class="ai-title" style="border-left-color: var(--success);">🎯 Soru Hedefleyici İstatistik Merkezi</h2>
+                <span class="toggle-icon" id="questionIcon">▲</span>
+            </div>
+            <div class="collapsible-content" id="questionCollapse">
+                <div style="display: flex; flex-wrap: wrap; gap: 5px;">
+                    <button class="btn btn-success" style="font-weight:bold;" onclick="runLiveGeminiAI('question')">📊 Seçilen Sayısal Konuların Soru Hedeflerini Hesapla</button>
+                </div>
+                <div class="ai-response-box" id="aiQuestionOutput" style="border-color: var(--success); background-color: #141e18;">Soru adetleri burada parçalanacak kral...</div>
+            </div>
+        </div>
+
+        <!-- DERİNLEMESİNE KAYNAK KİTAP ÖNERİCİ -->
+        <div class="card" style="border-color: #0284c7;">
+            <div class="card-header-toggle" onclick="toggleCardContent('booksCollapse', 'booksIcon')">
+                <h2 style="border-left-color: #0284c7;">📚 Eş Seviye Çoklu Kaynak Kitap Önerici</h2>
+                <span class="toggle-icon" id="booksIcon">▲</span>
+            </div>
+            <div class="collapsible-content" id="booksCollapse" style="display: block;">
+                <div class="book-tabs">
+                    <button class="book-tab-btn active" id="btnBookTyt" onclick="switchBookExam('TYT')">📚 TYT Sayısal Havuzu</button>
+                    <button class="book-tab-btn" id="btnBookAyt" onclick="switchBookExam('AYT')">📐 AYT Sayısal Havuzu</button>
+                </div>
+                <div class="book-config-form">
+                    <select id="bookLessonSelect" style="padding: 8px; font-size: 0.9rem;"></select>
+                    <select id="levelSelect" style="padding: 8px; font-size: 0.9rem;">
+                        <option value="Başlangıç Seviyesi">Temel Seviye (Sıfır / İlk Adım Kaynakları)</option>
+                        <option value="Orta Seviye" selected>Orta Seviye (Gelişim / ÖSYM Tipi Kaynaklar)</option>
+                        <option value="İleri Düzey">İleri Düzey (Derece / Sınır Zorlayıcı Kaynaklar)</option>
+                    </select>
+                    <button class="btn" style="background-color: #0284c7; font-weight: bold;" onclick="runLiveGeminiAI('books')">📖 Aynı Seviyede Birkaç Net Doğru Kaynak Öner</button>
+                </div>
+                <div id="aiBooksOutput">
+                    <div class="ai-response-box" style="border-color: #0284c7; background-color: #121824;">Kaynaklar buraya dizilecek kral...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 📅 HAFTALIK DERS PROGRAMI MATRIXI -->
+        <div class="card" style="border-color: var(--primary);">
+            <h2>📅 Tam Hafta Sol Saat Bloklu Ders Programın (Pzt - Pazar)</h2>
+            <div style="overflow-x: auto; margin-top: 15px;">
+                <table class="schedule-table">
+                    <thead><tr><th>Saat Bloğu</th><th>Pazartesi</th><th>Salı</th><th>Çarşamba</th><th>Perşembe</th><th>Cuma</th><th>Cumartesi</th><th>Pazar</th></tr></thead>
+                    <tbody>
+                        <tr><td>09:00 - 11:00</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b1-pazar"></div></td></tr>
+                        <tr><td>11:15 - 13:15</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b2-pazar"></div></td></tr>
+                        <tr><td>14:15 - 16:15</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b3-pazar"></div></td></tr>
+                        <tr><td>16:30 - 18:30</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b4-pazar"></div></td></tr>
+                        <tr><td>19:30 - 21:30</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b5-pazar"></div></td></tr>
+                        <tr><td>21:45 - 23:30</td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-pazartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-sali"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-carsamba"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-persembe"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-cuma"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-cumartesi"></div></td><td><div class="schedule-cell-content" contenteditable="true" id="cell-b6-pazar"></div></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 📅 SEKMELİ DERS VE SORU TAKİP TAKVİMİ -->
+        <div class="card">
+            <h2>📅 Aylık & Haftalık Sayısal Ders / Soru Takip Takvimi</h2>
+            <div class="month-tabs" id="monthTabsContainer" style="margin-top: 15px;"></div>
+            <div class="week-tabs" id="weekTabsContainer"></div>
+            
+            <div class="log-form-premium">
+                <div class="form-row"><label>☀️ Gün Seçimi :</label><select id="daySelect"><option>Pazartesi</option><option>Salı</option><option>Çarşamba</option><option>Perşembe</option><option>Cuma</option><option>Cumartesi</option><option>Pazar</option></select></div>
+                <div class="form-row"><label>📚 Hedef Sayısal Ders :</label><select id="lessonSelect" onchange="updateKonuSelect()"></select></div>
+                <div class="form-row"><label>🎯 Çalışılan Konu :</label><select id="topicSelect"><option value="">-- Önce Ders Seç --</option></select></div>
+                <div class="form-row"><label>✍️ Çözülen Soru Sayısı :</label><input type="number" id="questionInput" placeholder="Örn: 80" min="0"></div>
+                <button class="btn btn-success" style="padding: 12px; font-weight: bold; font-size: 1.05rem; margin-top: 6px; width: 100%;" onclick="executeAddLog()">Programa İşle</button>
+            </div>
+            <h4 id="tableHeaderLabel" style="margin-top: 15px; color: var(--month-color); font-size: 0.95rem;">📍 Temmuz Ayı - {1. Hafta} Çalışma Listesi:</h4>
+            <table class="log-table"><thead><tr><th>Gün</th><th>Ders</th><th>Konu</th><th>Çözülen Soru</th><th>İşlem</th></tr></thead><tbody id="logTableBody"></tbody></table>
+        </div>
+    </div>
+
+    <!-- SAĞ TARAF -->
+    <div class="card subjects-panel">
+
+        <!-- 🏋️‍♂️ SPOR AYARLAYICI -->
+        <div class="sport-config-box" style="border-color: #ef4444; background: #2d1616; margin-bottom: 20px;">
+            <h3 style="border-left-color: #ef4444; font-size: 1.05rem; margin-bottom: 8px; color: #fecaca;">🏋️‍♂️ Spor Günleri Akıllı Zaman Ayarlayıcı</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <select id="sportTimeSlot" onchange="saveSportConfig()" style="padding:4px; font-size:0.85rem; width:100%;">
+                    <option value="YES_SPORT">✅ Spora Gidiyorum (Pzt, Sal, Prş, Cum)</option>
+                    <option value="NO_SPORT">❌ Spora Devam Etmiyorum / Bıraktım</option>
+                </select>
+                <div style="margin-top: 5px;">
+                    <span style="font-size: 0.8rem; font-weight: bold;">Fitness Seans Aralığını Gir (Serbest):</span>
+                    <input type="text" id="sportExactHourInput" placeholder="Örn: 18:30 - 20:30" style="padding:8px; font-size:0.85rem; width:100%; background:#1e1414; margin-top:3px; border: 1px solid #ef4444;" oninput="saveSportConfig()">
+                </div>
+                <div id="sportStatusInfo" style="font-size:0.8rem; color:var(--text-muted); line-height:1.4; border-top: 1px solid #451a1a; padding-top:6px;"></div>
+            </div>
+        </div>
+
+        <!-- 🧠 CANLI DERS REHBERLİK & NOT MERKEZİ -->
+        <div class="card" style="border-color: #3b82f6; background-color: #1e3a8a;">
+            <h3 style="border-left-color: #3b82f6; color: #eff6ff;">🧠 Canlı Sayısal Ders Notu & Taktik İstasyonu</h3>
+            <div class="station-box">
+                <div class="station-form-group"><select id="stationExamType" onchange="updateStationLessons()"><option value="TYT">TYT</option><option value="AYT">AYT</option></select><select id="stationLessonSelect" onchange="updateStationTopics()"></select></div>
+                <div class="station-form-group"><select id="stationTopicSelect" style="width: 100%;"></select></div>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; margin-top: 5px;">
+                    <button class="btn btn-warning" style="font-size:0.8rem; padding:6px 10px;" onclick="runLiveGeminiAI('station_notes')">📝 Hap Notları Getir</button>
+                    <button class="btn btn-success" style="font-size:0.8rem; padding:6px 10px;" onclick="runLiveGeminiAI('station_tactics')">🎯 Akılda Tutma Taktiği</button>
+                    <button class="btn btn-ai" style="font-size:0.8rem; padding:6px 10px; background-color:#ef4444;" onclick="runLiveGeminiAI('station_focus')">🧘‍♂️ Odaklanma Artırıcı</button>
+                </div>
+            </div>
+            <div class="ai-response-box" id="aiStationOutput" style="border-color: #3b82f6; background-color: #0f172a; max-height: 250px; overflow-y: auto; font-size:0.88rem;">Seçtiğin konunun akademik notları buraya düşecek...</div>
+        </div>
+
+        <!-- 🏆 YKS TEK VE ÖZGÜR KAYNAK KİTAP FABRİKASI -->
+        <div class="finished-sources-box" style="border-color: #6366f1;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;"><h3 style="border-left-color: #6366f1; font-size: 1.05rem; color: #e0e7ff;">🏆 YKS Kaynak Kitap Fabrikası</h3><span id="finishedBooksCounterBadge" style="background: var(--success); color: white; padding: 2px 8px; border-radius: 20px; font-size: 0.8rem;">Biten: 0</span></div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <span style="font-size: 0.78rem;">📚 Arşive Kitap Ekle :</span>
+                <div style="display: flex; gap: 4px;"><button class="btn btn-secondary" id="btnSourceTyt" style="flex:1; padding:5px; font-size:0.8rem; background-color:#6366f1;" onclick="switchSourceExamType('TYT')">TYT</button><button class="btn btn-secondary" id="btnSourceAyt" style="flex:1; padding:5px; font-size:0.8rem;" onclick="switchSourceExamType('AYT')">AYT</button></div>
+                <select id="sourceLessonSelect" style="width: 100%;"></select><input type="text" id="sourceBrandInput" placeholder="Yayınevi veya Kaynak Adını Yaz" style="width: 100%;">
+                <button class="btn btn-secondary" onclick="addNewFinishedSource()" style="background-color: #312e81; width: 100%;">Arşive Gönder</button>
+            </div>
+            <div style="font-size: 0.8rem; color: var(--warning); margin-top: 10px; font-weight: bold; border-top: 1px solid #27272a; padding-top: 6px;">⬇️ Bitirilen Kitaplar Kitaplığı:</div>
+            <div id="sourceItemsContainer" style="margin-top: 4px; max-height: 150px; overflow-y: auto;"></div>
+        </div>
+
+        <h2 class="section-divider">📚 TYT SAYISAL MÜFREDATI</h2><div id="tytSubjectsContainer"></div>
+        <h2 class="section-divider" style="margin-top: 30px;">📐 AYT SAYISAL MÜFREDATI</h2><div id="aytSubjectsContainer"></div>
+    </div>
+</div>
+
+<script>
+    const tytMüfredat = {
+        "TYT Matematik": ["Temel Kavramlar", "Sayı Basamakları", "Bölme ve Bölünebilme", "EBOB-EKOK", "Rasyonel Sayılar", "Birinci Dereceden Denklemler", "Basit Eşitsizlikler", "Mutlak Değer", "Köklü İfadeler", "Çarpanlara Ayırma", "Oran-Orantı", "Problemler", "Kümeler", "Fonksiyonlar", "Permütasyon-Kombinasyon", "Binom ve Olasılık", "İstatistik"],
+        "TYT Türkçe": ["Sözcükte Anlam", "Cümlede Anlam", "Paragrafta Anlam", "Ses Bilgisi", "Yazım Kuralları", "Noktalama İşaretleri", "Sözcükte Yapı", "Sözcük Türleri", "Edat-Bağlaç-Ünlem", "Fiiller ve Fiilimsiler", "Cümlenin Ögeleri", "Anlatım Bozuklukları"],
+        "TYT Fizik": ["Fizik Bilimine Giriş", "Madde ve Özellikleri", "Hareket ve Kuvvet", "İş, Güç ve Enerji", "Isı, Sıcaklık ve Genleşme", "Elektrostatik", "Elektrik ve Manyetizma", "Basınç ve Kaldırma Kuvveti", "Dalgalar", "Optik"],
+        "TYT Kimya": ["Kimya Bilimi", "Atom ve Periyodik Sistem", "Kimyasal Türler Arası Etkileşimler", "Maddenin Halleri", "Doğa ve Kimya", "Kimyanın Temel Kanunları", "Mol Kavramı", "Kimyasal Hesaplamalar", "Karışımlar", "Asitler, Baslar ve Tuzlar"],
+        "TYT Biyoloji": ["Canlıların Ortak Özellikleri", "Canlıların Temel Bileşenleri", "Hücre ve Yapısı", "Canlıların Sınıflandırılması", "Hücre Bölünmeleri", "Kalıtım Kuralları", "Ekosistem Ekolojisi"]
+    };
+
+    const aytMüfredat = {
+        "AYT Matematik": ["İkinci Dereceden Denklemler", "Karmaşık Sayılar", "Eşitsizlikler", "Parabol", "Trigonometri", "Logaritma", "Diziler", "Limit ve Süreklilik", "Türev", "İntegral"],
+        "AYT Fizik": ["Vektörler ve Bağıl Hareket", "Newton’ın Hareket Yasaları", "Sabit İvmeli Hareket", "Atışlar", "Enerji ve İtme-Momentum", "Tork ve Denge", "Basit Makineler", "Elektriksel Kuvvet ve Alan", "Sığaçlar ve İndüksiyon", "Düzgün Çembersel Hareket", "Basit Harmonik Hareket", "Dalga Mekaniği", "Modern Fizik"],
+        "AYT Kimya": ["Modern Atom Teorisi", "Gazlar", "Sıvı Çözeltiler", "Kimyasal Tepkemelerde Enerji", "Kimyasal Tepkimelerde Hız", "Kimyasal Denge", "Kimya ve Elektrik", "Karbon Kimyasına Giriş", "Organik Bileşikler"],
+        "AYT Biyoloji": ["İnsan Fizyolojisi (Tüm Sistemler)", "Komünite ve Popülasyon Ekolojisi", "Genden Proteine", "Canlılarda Enerji Dönüşümleri", "Bitki Biyolojisi"]
+    };
+
+    const birlesikMüfredat = {...tytMüfredat, ...aytMüfredat};
+    const aylarListesi = ["Temmuz", "Ağustos", "Eylul", "Ekim", "Kasim", "Aralik", "Ocak", "Subat", "Mart", "Nisan", "Mayis", "Haziran"];
+    
+    let selectedMonth = "Temmuz"; let selectedWeek = 1; let currentBookExam = "TYT"; let currentSourceExamType = "TYT";
+    let multiMonthData = {}; aylarListesi.forEach(ay => { multiMonthData[ay] = { hafta1: [], hafta2: [], hafta3: [], hafta4: [] }; });
+
+    let trackedWorkTimeData = {};
+    aylarListesi.forEach(ay => {
+        trackedWorkTimeData[ay] = {
+            hafta1: { pazartesi: 0, sali: 0, carsamba: 0, persembe: 0, cuma: 0, cumartesi: 0, pazar: 0 },
+            hafta2: { pazartesi: 0, sali: 0, carsamba: 0, persembe: 0, cuma: 0, cumartesi: 0, pazar: 0 },
+            hafta3: { pazartesi: 0, sali: 0, carsamba: 0, persembe: 0, cuma: 0, cumartesi: 0, pazar: 0 },
+            hafta4: { pazartesi: 0, sali: 0, carsamba: 0, persembe: 0, cuma: 0, cumartesi: 0, pazar: 0 }
+        };
+    });
+
+    let tInterval, running = false, remainingSeconds = 0, initialSetSeconds = 0; const display = document.getElementById("timerDisplay");
+    let exInterval, exRunning = false, exRemaining = 180;
+
+    window.onload = function() {
+        loadSavedLogData(); loadSavedWorkTimeData(); renderSeparateSubjects(); loadSavedTopicChecks(); renderMonthAndWeekTabs(); populateFormLessons(); setupWeekInterface(); setupTimerEvents(); loadSavedApiKey(); loadSportConfig(); switchSourceExamType("TYT"); loadFinishedSources(); switchBookExam("TYT"); updateStationLessons(); updateExerciseDescription(); loadSavedSchedule(); loadSavedAIOutputs(); calculateCurrentLevel(); loadFinishedNovels(); loadCurrentNovelState(); populateStatsMonthSelect(); setDefaultTargetDay(); calculateWeeklyWorkHours();
+    };
+
+    function toggleCardContent(contentId, iconId) {
+        const content = document.getElementById(contentId); const icon = document.getElementById(iconId);
+        if (content.style.display === "none" || content.style.display === "") { content.style.display = "block"; icon.innerText = "▲"; } else { content.style.display = "none"; icon.innerText = "▼"; }
+    }
+
+    function updateExerciseDescription() { const idx = document.getElementById("exerciseSelect").value; document.getElementById("exerciseDescBox").innerHTML = exerciseDescriptions[idx]; }
+
+    function loadSavedAIOutputs() {
+        try {
+            const o1 = localStorage.getItem("yks_ai_cache_weekly"); if(o1) document.getElementById("aiOutput").innerHTML = o1;
+            const o2 = localStorage.getItem("yks_ai_cache_question"); if(o2) document.getElementById("aiQuestionOutput").innerHTML = o2;
+            const o3 = localStorage.getItem("yks_ai_cache_books"); if(o3) document.getElementById("aiBooksOutput").innerHTML = o3;
+            const o4 = localStorage.getItem("yks_ai_cache_station"); if(o4) document.getElementById("aiStationOutput").innerHTML = o4;
+            const o5 = localStorage.getItem("yks_ai_cache_culture"); if(o5) document.getElementById("aiCultureOutput").innerHTML = o5;
+            const o6 = localStorage.getItem("yks_ai_cache_novel"); if(o6) document.getElementById("aiNovelOutput").innerHTML = o6;
+        } catch(e) {}
+    }
+
+    function cleanMarkdownToHtml(text) {
+        if (!text) return "";
+        try {
+            let html = text
+                .replace(/\*\*(.*?)\*\*/g, "<strong style='color: var(--warning);'>$1</strong>")
+                .replace(/\*(.*?)\*/g, "<em>$1</em>")
+                .replace(/###\s?(.*)/g, "<h4 style='color: var(--warning); margin-top: 10px;'>$1</h4>")
+                .replace(/##\s?(.*)/g, "<h3 style='color: var(--warning); margin-top: 15px; border-bottom: 1px solid #3f3f46; padding-bottom: 5px; font-size:1.15rem;'>$1</h3>")
+                .replace(/#\s?(.*)/g, "<h2 style='color: var(--warning); margin-top: 20px; font-size:1.3rem;'>$1</h2>")
+                .replace(/-\s(.*)/g, "<li style='margin-left: 20px; margin-bottom: 8px; list-style-type: none;'><span style='color: var(--month-color); font-weight:bold;'>▶</span> <span style='color: #e4e4e7;'>$1</span></li>");
+            return html.split("\n").map(line => {
+                let trimmed = line.trim(); if(!trimmed) return ""; if(trimmed.startsWith("<h") || trimmed.startsWith("<li")) return trimmed; return `<p style="margin-bottom:10px;">${trimmed}</p>`;
+            }).join("");
+        } catch(err) { return text; }
+    }
+
+    function saveTopicChecks() {
+        let checkedMap = {}; 
+        document.querySelectorAll('.topic-check').forEach(cb => { 
+            let uniqueKey = cb.getAttribute('data-ders') + "||" + cb.getAttribute('data-topic'); 
+            checkedMap[uniqueKey] = cb.checked; 
+        });
+        localStorage.setItem("yks_saved_topic_checkboxes", JSON.stringify(checkedMap));
+        calculateCurrentLevel();
+    }
+
+    function loadSavedTopicChecks() {
+        let savedMap = JSON.parse(localStorage.getItem("yks_saved_topic_checkboxes")); if(!savedMap) return;
+        document.querySelectorAll('.topic-check').forEach(cb => { let uniqueKey = cb.getAttribute('data-ders') + "||" + cb.getAttribute('data-topic'); if(savedMap[uniqueKey] !== undefined) { cb.checked = savedMap[uniqueKey]; } });
+    }
+
+    function switchSourceExamType(type) {
+        currentSourceExamType = type; document.getElementById("btnSourceTyt").style.backgroundColor = type === "TYT" ? "#6366f1" : "#3f3f46"; document.getElementById("btnSourceAyt").style.backgroundColor = type === "AYT" ? "#6366f1" : "#3f3f46";
+        const selectBox = document.getElementById("sourceLessonSelect"); if(!selectBox) return; selectBox.innerHTML = "";
+        const dersler = type === "TYT" ? ["Matematik", "Türkçe", "Fizik", "Kimya", "Biyoloji"] : ["Matematik", "Fizik", "Kimya", "Biyoloji"];
+        dersler.forEach(d => { selectBox.innerHTML += `<option value="${type} ${d}">${type} ${d}</option>`; });
+    }
+
+    function addNewFinishedSource() {
+        const dersKombinasyon = document.getElementById("sourceLessonSelect").value; const brand = document.getElementById("sourceBrandInput").value.trim();
+        if(!brand) return alert("Kaynak İsmini Boş Bırakma Kral!");
+        let sources = JSON.parse(localStorage.getItem("yks_finished_sources_pool")) || []; sources.push({ lesson: dersKombinasyon, book: brand });
+        localStorage.setItem("yks_finished_sources_pool", JSON.stringify(sources)); document.getElementById("sourceBrandInput").value = "";
+        loadFinishedSources(); alert("🏆 Başarıyla sayısal test kütüphanene gönderildi şampiyon!");
+    }
+
+    function removeSpecificBook(lesson, bookName) {
+        let sources = JSON.parse(localStorage.getItem("yks_finished_sources_pool")) || []; let index = sources.findIndex(s => s.lesson === lesson && s.book === bookName);
+        if(index !== -1) { sources.splice(index, 1); localStorage.setItem("yks_finished_sources_pool", JSON.stringify(sources)); loadFinishedSources(); }
+    }
+
+    function loadFinishedSources() {
+        const container = document.getElementById("sourceItemsContainer"); if(!container) return; let sources = JSON.parse(localStorage.getItem("yks_finished_sources_pool")) || [];
+        document.getElementById("finishedBooksCounterBadge").innerText = "Biten: " + sources.length;
+        if(sources.length === 0) { container.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted); font-style:italic">Henüz biten kaynak eklenmedi kral.</span>`; return; }
+        let groupedMap = {}; sources.forEach(item => { if(!groupedMap[item.lesson]) { groupedMap[item.lesson] = []; } if(!groupedMap[item.lesson].includes(item.book)) { groupedMap[item.lesson].push(item.book); } });
+        container.innerHTML = "";
+        Object.keys(groupedMap).sort().forEach(lesson => {
+            let booksHtml = groupedMap[lesson].map(b => { return `<span style="background: #312e81; padding: 2px 6px; border-radius: 4px; margin-right: 4px; display: inline-flex; align-items: center; gap: 4px; margin-bottom:4px;">${b} <span style="color:#ef4444; cursor:pointer; font-weight:bold;" onclick="removeSpecificBook('${lesson}', '${b}')">x</span></span>`; }).join("");
+            container.innerHTML += `<div class="source-item" style="display:block; line-height: 1.8; margin-bottom: 8px;"><strong>${lesson}</strong> - <span class="source-books-list">${booksHtml}</span></div>`;
+        });
+    }
+
+    function saveCurrentNovelState() { localStorage.setItem("yks_current_novel_state_value", document.getElementById("currentReadingNovelInput").value); }
+    function loadCurrentNovelState() { const saved = localStorage.getItem("yks_current_novel_state_value"); if(saved) document.getElementById("currentReadingNovelInput").value = saved; }
+    
+    function markCurrentNovelAsRead() {
+        const novelName = document.getElementById("currentReadingNovelInput").value.trim(); if(!novelName) return alert("Kral masada okunan edebi kitap hücresi boş!");
+        let novels = JSON.parse(localStorage.getItem("yks_finished_novels_pool")) || []; if(!novels.includes(novelName)) { novels.push(novelName); localStorage.setItem("yks_finished_novels_pool", JSON.stringify(novels)); }
+        document.getElementById("currentReadingNovelInput").value = ""; localStorage.removeItem("yks_current_novel_state_value");
+        loadFinishedNovels(); alert("🏆 Başarıyla edebi arşiv kütüphanene işlendi kral!");
+    }
+    function removeSpecificNovel(novelName) {
+        let novels = JSON.parse(localStorage.getItem("yks_finished_novels_pool")) || []; let idx = novels.indexOf(novelName);
+        if(idx !== -1) { novels.splice(idx, 1); localStorage.setItem("yks_finished_novels_pool", JSON.stringify(novels)); loadFinishedNovels(); }
+    }
+    function loadFinishedNovels() {
+        const container = document.getElementById("novelItemsContainer"); if(!container) return; let novels = JSON.parse(localStorage.getItem("yks_finished_novels_pool")) || [];
+        document.getElementById("finishedNovelsCounterBadge").innerText = "Biten Eser: " + novels.length;
+        if(novels.length === 0) { container.innerHTML = `<span style="font-size:0.8rem; color:var(--text-muted); font-style:italic">Henüz biten edebi eser eklenmedi kral.</span>`; return; }
+        container.innerHTML = ""; novels.forEach(n => { container.innerHTML += `<div class="source-item" style="background:#132b21; border-left-color:#10b981;"><span>📖 <b>${n}</b></span><span style="color:#ef4444; cursor:pointer; font-weight:bold; padding:0 6px;" onclick="removeSpecificNovel('${n}')">x</span></div>`; });
+    }
+
+    function saveApiKeyToSystem() { const key = document.getElementById("uiApiKeyInput").value.trim(); if(!key) return alert("Key gir kral!"); localStorage.setItem("yks_panel_gemini_key", key); alert("✅ API Key Kaydedildi!"); }
+    function clearApiKeyFromSystem() { localStorage.removeItem("yks_panel_gemini_key"); document.getElementById("uiApiKeyInput").value = ""; alert("🗑️ Key Silindi."); }
+    function loadSavedApiKey() { const savedKey = localStorage.getItem("yks_panel_gemini_key"); if(savedKey) document.getElementById("uiApiKeyInput").value = savedKey; }
+
+    function saveSportConfig() {
+        const slot = document.getElementById("sportTimeSlot").value; const exactHour = document.getElementById("sportExactHourInput").value.trim() || "Belirtilmedi";
+        localStorage.setItem("yks_sport_time_slot", slot); localStorage.setItem("yks_sport_exact_hour", exactHour);
+        const infoDiv = document.getElementById("sportStatusInfo"); if(!infoDiv) return;
+        infoDiv.innerHTML = slot === "NO_SPORT" ? "📌 Spor pasif. Bütün pencereler derslere açık." : `📌 Fitness Aktif. Antrenman bloğun: <strong>${exactHour}</strong> olarak kilitlendi.`;
+    }
+    function loadSportConfig() { const savedSlot = localStorage.getItem("yks_sport_time_slot"); const savedHour = localStorage.getItem("yks_sport_exact_hour"); if(savedSlot) document.getElementById("sportTimeSlot").value = savedSlot; if(savedHour) document.getElementById("sportExactHourInput").value = savedHour; saveSportConfig(); }
+
+    function switchBookExam(examType) {
+        currentBookExam = examType; document.getElementById("btnBookTyt").classList.toggle("active", examType === "TYT"); document.getElementById("btnBookAyt").classList.toggle("active", examType === "AYT");
+        const selectBox = document.getElementById("bookLessonSelect"); if(!selectBox) return; selectBox.innerHTML = "";
+        const hedefMüfredat = examType === "TYT" ? tytMüfredat : aytMüfredat; for (let ders in hedefMüfredat) { selectBox.innerHTML += `<option value="${ders}">${ders}</option>`; }
+    }
+
+    function updateStationLessons() {
+        const type = document.getElementById("stationExamType").value; const lSelect = document.getElementById("stationLessonSelect"); if(!lSelect) return; lSelect.innerHTML = "";
+        const pool = type === "TYT" ? tytMüfredat : aytMüfredat; for(let d in pool) { lSelect.innerHTML += `<option value="${d}">${d}</option>`; }
+        updateStationTopics();
+    }
+
+    function updateStationTopics() {
+        const type = document.getElementById("stationExamType").value; const ders = document.getElementById("stationLessonSelect").value;
+        const tSelect = document.getElementById("stationTopicSelect"); if(!tSelect || !ders) return; tSelect.innerHTML = "";
+        const pool = type === "TYT" ? tytMüfredat : aytMüfredat; if(pool[ders]) { pool[ders].forEach(t => { tSelect.innerHTML += `<option value="${t}">${t}</option>`; }); }
+    }
+
+    function renderMonthAndWeekTabs() {
+        const mContainer = document.getElementById("monthTabsContainer"); if(!mContainer) return; mContainer.innerHTML = ""; 
+        aylarListesi.forEach(ay => { mContainer.innerHTML += `<button class="month-btn ${ay === selectedMonth ? 'active' : ''}" onclick="switchMonth('${ay}')">${ay}</button>`; });
+        const wContainer = document.getElementById("weekTabsContainer"); if(!wContainer) return; wContainer.innerHTML = ""; 
+        for (let i = 1; i <= 4; i++) { wContainer.innerHTML += `<button class="week-btn ${i === selectedWeek ? 'active' : ''}" onclick="switchWeek(${i})">${i}. Hafta</button>`; }
+    }
+    function switchMonth(ay) { selectedMonth = ay; renderMonthAndWeekTabs(); setupWeekInterface(); document.getElementById("statsMonthSelect").value = ay; updateStatsFilter(); }
+    function switchWeek(haftaNum) { selectedWeek = haftaNum; renderMonthAndWeekTabs(); setupWeekInterface(); document.getElementById("statsWeekSelect").value = haftaNum; updateStatsFilter(); }
+
+    function populateFormLessons() {
+        const lessonSelect = document.getElementById("lessonSelect"); if(!lessonSelect) return; lessonSelect.innerHTML = `<option value="">-- Ders Seç --</option>`;
+        for(let ders in birlesikMüfredat) { lessonSelect.innerHTML += `<option value="${ders}">${ders}</option>`; }
+    }
+
+    function updateKonuSelect() {
+        const ders = document.getElementById("lessonSelect").value; const topicSelect = document.getElementById("topicSelect"); if(!topicSelect) return;
+        if(!ders) { topicSelect.innerHTML = `<option value="">-- Konu Seç --</option>`; return; }
+        let html = `<option value="">-- Konu Seç --</option>`; birlesikMüfredat[ders].forEach(konu => { html += `<option value="${konu}">${konu}</option>`; }); topicSelect.innerHTML = html;
+    }
+
+    function setupWeekInterface() { const label = document.getElementById("tableHeaderLabel"); if(label) label.innerText = `📍 ${selectedMonth} Ayı - {${selectedWeek}. Hafta} Sayısal Çalışma Listesi:`; refreshTable(); }
+
+    function executeAddLog() {
+        const day = document.getElementById("daySelect").value; const ders = document.getElementById("lessonSelect").value; const konu = document.getElementById("topicSelect").value; const soru = document.getElementById("questionInput").value;
+        if(!ders || !konu || !soru) return alert("Kral alanları doldur!"); 
+        if(!multiMonthData[selectedMonth]) { multiMonthData[selectedMonth] = { hafta1: [], hafta2: [], hafta3: [], hafta4: [] }; }
+        multiMonthData[selectedMonth][`hafta${selectedWeek}`].push({ gün: day, ders: ders, konu: konu, soru: soru });
+        saveLogDataToLocalStorage(); refreshTable(); calculateCurrentLevel(); document.getElementById("questionInput").value = "";
+    }
+    function removeLog(index) { multiMonthData[selectedMonth][`hafta${selectedWeek}`].splice(index, 1); saveLogDataToLocalStorage(); refreshTable(); calculateCurrentLevel(); }
+    function refreshTable() {
+        const tbody = document.getElementById("logTableBody"); if(!tbody) return; tbody.innerHTML = ""; if(!multiMonthData[selectedMonth] || !multiMonthData[selectedMonth][`hafta${selectedWeek}`]) return;
+        multiMonthData[selectedMonth][`hafta${selectedWeek}`].forEach((item, idx) => { tbody.innerHTML += `<tr><td><b>${item.gün}</b></td><td>${item.ders}</td><td>${item.konu}</td><td><span style="color:var(--success); font-weight:bold;">${item.soru}</span> Soru</td><td><button class="btn btn-danger" style="padding:4px 8px; font-size:0.8rem;" onclick="removeLog(${idx})">Sil</button></td></tr>`; });
+    }
+    function saveLogDataToLocalStorage() { localStorage.setItem("yks_multi_month_calendar_data", JSON.stringify(multiMonthData)); }
+    function loadSavedLogData() { const saved = localStorage.getItem("yks_multi_month_calendar_data"); if(saved) { try { let parsed = JSON.parse(saved); if(parsed && typeof parsed === 'object') multiMonthData = parsed; } catch(e){} } }
+
+    function populateStatsMonthSelect() {
+        const select = document.getElementById("statsMonthSelect"); if(!select) return; select.innerHTML = "";
+        aylarListesi.forEach(ay => { select.innerHTML += `<option value="${ay}">${ay}</option>`; });
+        select.value = selectedMonth; document.getElementById("statsWeekSelect").value = selectedWeek;
+    }
+
+    function setDefaultTargetDay() {
+        let todayIdx = new Date().getDay();
+        let dayKeys = ["pazar", "pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi"];
+        let select = document.getElementById("timerTargetDaySelect");
+        if(select && dayKeys[todayIdx]) select.value = dayKeys[todayIdx];
+    }
+
+    function saveWorkTimeData() { localStorage.setItem("yks_tracked_work_time_data", JSON.stringify(trackedWorkTimeData)); }
+    function loadSavedWorkTimeData() {
+        const saved = localStorage.getItem("yks_tracked_work_time_data");
+        if(saved) { try { let parsed = JSON.parse(saved); if(parsed) trackedWorkTimeData = parsed; } catch(e){} }
+    }
+
+    function finishSessionAndLog() {
+        if (initialSetSeconds <= 0) return alert("Kral önce kurduğum veya başlattığın aktif bir süre olmalı!");
+        let elapsedSec = initialSetSeconds - remainingSeconds;
+        if (elapsedSec < 10) return alert("Kral en az 10 saniye çalışmış olmalısın!");
+        
+        let elapsedMin = Math.round(elapsedSec / 60);
+        clearInterval(tInterval); running = false; remainingSeconds = 0; initialSetSeconds = 0;
+        updateTimerDisplay(); display.style.color = "var(--primary)";
+        document.getElementById("startBtn").style.display = "inline-block"; document.getElementById("pauseBtn").style.display = "none";
+
+        let selectedTargetDay = document.getElementById("timerTargetDaySelect").value;
+        let targetMonth = document.getElementById("statsMonthSelect").value || selectedMonth;
+        let targetWeekKey = `hafta${document.getElementById("statsWeekSelect").value || selectedWeek}`;
+
+        if (!trackedWorkTimeData[targetMonth]) {
+            trackedWorkTimeData[targetMonth] = { hafta1:{}, hafta2:{}, hafta3:{}, hafta4:{} };
+        }
+        if (!trackedWorkTimeData[targetMonth][targetWeekKey]) {
+            trackedWorkTimeData[targetMonth][targetWeekKey] = { pazartesi: 0, sali: 0, carsamba: 0, persembe: 0, cuma: 0, cumartesi: 0, pazar: 0 };
+        }
+
+        trackedWorkTimeData[targetMonth][targetWeekKey][selectedTargetDay] = (trackedWorkTimeData[targetMonth][targetWeekKey][selectedTargetDay] || 0) + elapsedMin;
+        saveWorkTimeData(); calculateWeeklyWorkHours();
+
+        let dayNamesMap = { pazartesi: "Pazartesi", sali: "Salı", carsamba: "Çarşamba", persembe: "Perşembe", cuma: "Cuma", cumartesi: "Cumartesi", pazar: "Pazar" };
+        alert(`🏁 Harika çalışma kral! Odaklandığın ${elapsedMin} dakika (${targetMonth} Ayı - ${targetWeekKey.replace('hafta','')} .Hafta ${dayNamesMap[selectedTargetDay]}) gününe eklendi!`);
+    }
+
+    function updateStatsFilter() { calculateWeeklyWorkHours(); }
+
+    function calculateWeeklyWorkHours() {
+        let m = document.getElementById("statsMonthSelect").value || selectedMonth;
+        let w = `hafta${document.getElementById("statsWeekSelect").value || selectedWeek}`;
+        
+        const gunler = ["pazartesi", "sali", "carsamba", "persembe", "cuma", "cumartesi", "pazar"];
+        let totalMinutes = 0;
+
+        gunler.forEach(gun => {
+            let mins = 0;
+            if (trackedWorkTimeData[m] && trackedWorkTimeData[m][w] && trackedWorkTimeData[m][w][gun]) {
+                mins = trackedWorkTimeData[m][w][gun];
+            }
+            totalMinutes += mins;
+            
+            let h = Math.floor(mins / 60);
+            let remM = mins % 60;
+            let displayStr = h > 0 ? `${h}S ${remM}Dk` : `${mins} Dk`;
+            document.getElementById(`wh-${gun}`).innerText = displayStr;
+        });
+
+        let totalH = Math.floor(totalMinutes / 60);
+        let totalRemM = totalMinutes % 60;
+        document.getElementById("weeklyTotalHoursBadge").innerText = `Haftalık: ${totalH} S ${totalRemM} Dk`;
+    }
+
+    function calculateCurrentLevel() {
+        let totalTytTopics = 0; let checkedTytTopics = 0; let totalAytTopics = 0; let checkedAytTopics = 0;
+        document.querySelectorAll('.topic-check').forEach(cb => {
+            let isTyt = cb.getAttribute('data-ders').startsWith("TYT"); if (isTyt) { totalTytTopics++; if(cb.checked) checkedTytTopics++; } else { totalAytTopics++; if(cb.checked) checkedAytTopics++; }
+        });
+        let tytPercent = totalTytTopics > 0 ? Math.round((checkedTytTopics / totalTytTopics) * 100) : 0;
+        let aytPercent = totalAytTopics > 0 ? Math.round((checkedAytTopics / totalAytTopics) * 100) : 0;
+        document.getElementById("tytLevelBar").style.width = tytPercent + "%"; document.getElementById("tytLevelPercent").innerText = "%" + tytPercent;
+        document.getElementById("tytLevelLabel").innerText = tytPercent > 70 ? "TYT Sayısal Zirve" : (tytPercent > 30 ? "TYT Sayısal Gelişim" : "TYT Temel Faz");
+        document.getElementById("aytLevelBar").style.width = aytPercent + "%"; document.getElementById("aytLevelPercent").innerText = "%" + aytPercent;
+        document.getElementById("aytLevelLabel").innerText = aytPercent > 70 ? "AYT Sayısal Derece" : (aytPercent > 30 ? "AYT Sayısal Orta" : "AYT Sayısal Başlangıç");
+    }
+
+    function renderSeparateSubjects() {
+        const tytContainer = document.getElementById("tytSubjectsContainer"); const aytContainer = document.getElementById("aytSubjectsContainer"); let tytHtml = "", aytHtml = "", idCounter = 0;
+        for (let ders in tytMüfredat) {
+            let safeId = "tyt_" + idCounter++; tytHtml += `<div class="subject-category"><div class="tyt-cate-title" onclick="toggleCategory('${safeId}')"><span>${ders}</span> <span>▼</span></div><div class="sub-list" id="${safeId}" style="display:none;">`;
+            tytMüfredat[ders].forEach(konu => { tytHtml += `<div class="sub-item"><input type="checkbox" class="topic-check" data-ders="${ders}" data-topic="${konu}" onchange="saveTopicChecks();"> ${konu}</div>`; }); tytHtml += `</div></div>`;
+        }
+        tytContainer.innerHTML = tytHtml;
+        for (let ders in aytMüfredat) {
+            let safeId = "ayt_" + idCounter++; aytHtml += `<div class="subject-category"><div class="ayt-cate-title" onclick="toggleCategory('${safeId}')"><span>${ders}</span> <span>▼</span></div><div class="sub-list" id="${safeId}" style="display:none;">`;
+            aytMüfredat[ders].forEach(konu => { aytHtml += `<div class="sub-item"><input type="checkbox" class="topic-check" data-ders="${ders}" data-topic="${konu}" onchange="saveTopicChecks();"> ${konu}</div>`; }); aytHtml += `</div></div>`;
+        }
+        aytContainer.innerHTML = aytHtml;
+    }
+
+    function toggleCategory(id) { const p = document.getElementById(id); p.style.display = (p.style.display === "none") ? "block" : "none"; }
+
+    function setupTimerEvents() {
+        const startBtn = document.getElementById("startBtn"), pauseBtn = document.getElementById("pauseBtn");
+        startBtn.addEventListener("click", () => { 
+            if (!running && remainingSeconds > 0) { 
+                tInterval = setInterval(countdownLogic, 1000); 
+                running = true; 
+                startBtn.style.display = "none"; 
+                pauseBtn.style.display = "inline-block"; 
+                display.style.color = "var(--success)"; 
+            } 
+        });
+        pauseBtn.addEventListener("click", () => { 
+            if (running) { 
+                clearInterval(tInterval); 
+                running = false; 
+                startBtn.style.display = "inline-block"; 
+                pauseBtn.style.display = "none"; 
+                display.style.color = "var(--primary)"; 
+            } 
+        });
+        document.getElementById("resetBtn").addEventListener("click", () => { 
+            clearInterval(tInterval); 
+            running = false; 
+            remainingSeconds = 0; 
+            initialSetSeconds = 0;
+            updateTimerDisplay(); 
+            startBtn.style.display = "inline-block"; 
+            pauseBtn.style.display = "none"; 
+            display.style.color = "var(--primary)"; 
+        });
+        document.getElementById("addManualBtn").addEventListener("click", () => { 
+            const input = document.getElementById("manualMinutes"); 
+            if (input.value && parseInt(input.value) > 0) { 
+                remainingSeconds = parseInt(input.value) * 60; 
+                initialSetSeconds = remainingSeconds;
+                updateTimerDisplay(); 
+                input.value = ""; 
+                display.style.color = "var(--primary)"; 
+            } 
+        });
+    }
+    function countdownLogic() { if (remainingSeconds <= 0) { clearInterval(tInterval); running = false; display.innerHTML = "Süre Bitti!"; display.style.color = "var(--danger)"; document.getElementById("startBtn").style.display = "inline-block"; document.getElementById("pauseBtn").style.display = "none"; return; } remainingSeconds--; updateTimerDisplay(); }
+    function updateTimerDisplay() { let h = Math.floor(remainingSeconds / 3600); let m = Math.floor((remainingSeconds % 3600) / 60); let s = remainingSeconds % 60; display.innerHTML = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`; }
+    function startMola(dk) { clearInterval(tInterval); running = true; remainingSeconds = dk * 60; display.style.color = "var(--warning)"; tInterval = setInterval(() => { if (remainingSeconds <= 0) { clearInterval(tInterval); running = false; display.innerHTML = "Masa Başına Kral!"; display.style.color = "var(--success)"; return; } remainingSeconds--; let m = Math.floor(remainingSeconds / 60), s = remainingSeconds % 60; display.innerHTML = `Mola: ${m}:${s<10?'0':''}${s}`; }, 1000); }
+
+    function startExerciseTimer() {
+        if(exRunning) return; exRunning = true;
+        exInterval = setInterval(() => {
+            if(exRemaining <= 0) { clearInterval(exInterval); exRunning = false; document.getElementById("exerciseDisplay").innerHTML = "Masa Başına!"; return; }
+            exRemaining--; let m = Math.floor(exRemaining / 60), s = exRemaining % 60; document.getElementById("exerciseDisplay").innerHTML = `${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
+        }, 1000);
+    }
+    function resetExerciseTimer() { clearInterval(exInterval); exRunning = false; exRemaining = 180; document.getElementById("exerciseDisplay").innerHTML = "03:00"; }
+
+    document.querySelectorAll('.schedule-cell-content').forEach(cell => { 
+        cell.addEventListener('input', () => { 
+            localStorage.setItem(`yks_matrix_${cell.id}`, cell.innerText); 
+        }); 
+    });
+    function loadSavedSchedule() { document.querySelectorAll('.schedule-cell-content').forEach(cell => { const saved = localStorage.getItem(`yks_matrix_${cell.id}`); if(saved) cell.innerText = saved; }); }
+
+    const exerciseDescriptions = [
+        "🥊 **Boksör Gölge Boksu:** Ayakta rahat bir gard al. Havaya doğru hafif ve kontrollü direkt yumruklar çıkar. Kan akışını hızlandırır.",
+        "👀 **Göz Odaklama Jimnastiği:** Parmağını burnuna yaklaştırıp uzaklaştırarak göz kaslarını çalıştır. Ekran yorgunluğunu fırlatır.",
+        "🧘 **Boyun Lateral Germe:** Sağ elinle başının sol tarafından tut ve yavaşça sağ omzuna doğru esnet. Damarları rahatlatır.",
+        "👐 **El Bileği Döndürme:** Yumruklarını sık ve bileklerini saat yönünde ve tersine dairesel olarak döndür.",
+        "🏃‍♂️ **Sandalyede Dize Dokunma:** Sandalyede hafif öne çık ve sırayla dizlerini göğsüne doğru çekerek ellerinle hafifçe bastır.",
+        "💪 **Shoulder Roll:** Omuzlarını kulaklarına kadar kaldır, arkaya doğru yuvarla ve serbest bırak.",
+        "🩺 **Derin Torasik Nefes:** Burnundan 4 saniyede diyaframını dolduracak şekilde nefes al, 4 saniye tut ve 6 saniyede ağzından yavaşça ver.",
+        "🧗‍♂️ **Masa Kenarı Şınav:** Ellerini masanın güvenli bir kenarına omuz genişliğinde koy, gövdeni dik tut ve 5-10 adet hafif şınav çek.",
+        "🦵 **Oturarak Arka Bacak Germe:** Sandalyenya ucuna gel, bir bacağını öne uzat, topuğunu yere bas ve parmak ucunu kendine çek.",
+        "🧘 **Torakal Omurga Rotasyonu:** Sandalyede dik otur, gövdeni tamamen sağa döndürüp sandalyeniz arkalığından tut ve hafifçe esne.",
+        "🤸‍♂️ **Kedi-Deve Sandalye Modu:** Sandalyede otururken sırtını kamburlaştırıp esnet."
+    ];
+
+    function compilePromptData(mode) {
+        const sportTimeSlot = document.getElementById("sportTimeSlot").value; const sportExactHour = document.getElementById("sportExactHourInput").value.trim() || "17:00 - 19:00";
+        const targetLevel = document.getElementById("levelSelect").value; const targetLesson = document.getElementById("bookLessonSelect").value;
+        const stLesson = document.getElementById("stationLessonSelect").value; const stTopic = document.getElementById("stationTopicSelect").value;
+        
+        let completedTopicsList = [];
+        let savedMap = JSON.parse(localStorage.getItem("yks_saved_topic_checkboxes")) || {};
+        for (let key in savedMap) {
+            if (savedMap[key] === true) {
+                let parts = key.split("||");
+                if (parts.length === 2) {
+                    completedTopicsList.push(`- ${parts[0]} / ${parts[1]}`);
+                }
+            }
+        }
+        let completedFilterText = completedTopicsList.length > 0 ? 
+            `⚠️ ÖĞRENCİNİN DAHA ÖNCE BİTİRDİĞİ (TİKLEDİĞİ) SAYISAL KONULAR (Bunları KESİNLİKLE tekrar programa verme, sıradaki yeni konuları işle):\n` + completedTopicsList.join("\n") : 
+            `Öğrenci henüz hiç konu tiklemedi, sayısal müfredata sıfırdan başlıyor.`;
+
+        const stageSelect = document.getElementById("userWorkStage").value;
+        let stageInstruction = "";
+        if (stageSelect === "STAGE_1") {
+            stageInstruction = "Öğrenci '1. Aşama: Alışma & Altyapı' fazındadır. Bloklar arasına orantılı ve yeterli dinlenme (15-30 dk mola) yerleştirerek günlük 4-5 saatlik temiz sayısal yükleme yap.";
+        } else if (stageSelect === "STAGE_2") {
+            stageInstruction = "Öğrenci '2. Aşama: Gelişim & Yükseliş' fazındadır. Günlük 6-7 saatlik yüksek verimli sayısal çalışma kur. Bloklar arasına dengeli nefeslenme molaları koy.";
+        } else if (stageSelect === "STAGE_3") {
+            stageInstruction = "Öğrenci '3. Aşama: Canavar & Derece' fazındadır. Günlük 8-10 saatlik yoğun sayısal yükleme yap, molaları zihni taze tutacak şekilde orantıla.";
+        }
+
+        if (mode === 'motivation') {
+            return `Sen elite seviyede hizmet veren sert, disiplinli bir YKS Sayısal Derece Koçusun. Hitabın "Kral", "Şampiyon" olmalı. Önemli cümleleri kalın yap.\n\nGörev: Sayısal adayına tıp, mühendislik veya derece hedefleri için sarsıcı, motive edici, masaya kilitleyecek bir konuşma yap. Tablo, matrix blokları KESİNLİKLE OLUŞTURMA. Sadece metin ver.`;
+        }
+
+        let sportInstruction = (sportTimeSlot === "NO_SPORT") ? "Öğrenci fitness salonuna gitmiyor." : `Öğrenci PAZARTESİ, SALI, PERŞEMBE ve CUMA günleri tam olarak kullanıcının belirlediği "${sportExactHour}" saat aralığında fitness yapıyor. Bu saat aralığına denk gelen bloklara KESİNLİKLE "🏋️‍♂️ Spor Seansı" yaz!`;
+
+        const systemCore = `Sen elite seviyede hizmet veren sert, disiplinli bir YKS Sayısal Derece Koçusun. Hitabın "Kral", "Şampiyon" olmalı. Çıktılarını çok okunaklı ve düzenli listeler halinde ver.\n\n${completedFilterText}\n\n🎯 MÜFREDAT KAPSAMI: SADECE SAYISAL DERSLER (Matematik, Fizik, Kimya, Biyoloji ve Türkçe). Tarih ve Coğrafya gibi sözel dersleri KESİNLİKLE müfredata ve programa alma!\n\n🏋️‍♂️ SPOR ZAMANI: ${sportInstruction}\n\n📈 KADEMELİ SÜRE VE ORANTILI DİNLENME KURALI: ${stageInstruction}\n\n⏱️ TABLOYA VE METNE YAZILACAK 6 ZORUNLU SAYISAL SAAT BLOKU: 09:00 - 11:00, 11:15 - 13:15, 14:15 - 16:15, 16:30 - 18:30, 19:30 - 21:30, 21:45 - 23:30. Saatleri sadece bu formatta ver.`;
+
+        if (mode === 'weekly') {
+            return `${systemCore}\n\n🚨 KESİNLİKLE HAYATİ KURAL 1 (TAM 7 GÜN KAPSAMI): Programı ASLA Çarşamba veya başka bir günde KESME! PAZARTESİ, SALI, ÇARŞAMBA, PERŞEMBE, CUMA, CUMARTESI ve PAZAR olmak üzere TÜM 7 GÜNÜN her birini sırasıyla tek tek eksiksiz olarak hazırla. Hafta sonu dahil tüm haftayı doldur!\n\n🚨 KESİNLİKLE HAYATİ KURAL 2: Yukarıda listelenen BİTİRİLMİŞ KONULARI ASLA PROGRAMA KOYMA! Müfredatta o biten konulardan sonra gelen YENİ ve EKSİK sayısal konularla sıradaki programı kur.\n\n🚨🚨 KESİNLİKLE HAYATİ KURAL 3 (ORANTILI DİNLENME & FAZ DETAYI): Yazdığın her sayısal ders bloğunun yanına o sürenin taktiğini ve soru hedefini eklemek ZORUNDASIN! Parantez içinde "[KONU + TEMEL TEST]" veya "[SADECE SORU ERİTME]" ibarelerini ekle.\n\nVerileri tablonun okuyabilmesi için metninin EN ALTINA tam olarak şu şablonu (MATRIX_DATA) eklemek ZORUNDASIN. Pzt, Salı, Çarşamba, Perşembe, Cuma, Cumartesi ve Pazar günlerinin TÜMÜ için satır üretmelisin!\n\nMATRIX_DATA_START\n09:00 - 11:00|pazartesi|Ders Adı - Konu Adı [Soru Sayısı] [Çalışma Fazı]\n11:15 - 13:15|pazartesi|Ders Adı - Konu Adı [Soru Sayısı] [Çalışma Fazı]\n14:15 - 16:15|sali|Ders Adı - Konu Adı [Soru Sayısı] [Çalışma Fazı]\nMATRIX_DATA_END`;
+        } else if (mode === 'question') {
+            return `${systemCore}\n\n🚨 FATAL ERROR UYARISI: KESİNLİKLE AMA KESİNLİKLE HAFTALIK DERS PROGRAMI, TABLO VEYA MATRIX SATIRLARI OLUŞTURMA! Görev: SADECE öğrencinin çalışacağı YENİ sayısal konular için soru hedeflerini net, kısa, madde işaretli, sarı başlıklarla süslenmiş estetik bir listeyle ver.`;
+        } else if (mode === 'books') {
+            return `YKS Sayısal Derece Koçusun. Ders: "${targetLesson}", Seviye: "${targetLevel}". 3 adet tamamen gerçek, piyasada bulunan net sayısal kaynak kitap önerisi yap. Önerileri çok şık listeler halinde sun.`;
+        } else if (mode === 'culture') {
+            return `Sayısal adayı için zihin açıcı mühendislik, fizik veya tıp dünyasından ilham verici bir bilim/teknoloji haberi sun.`;
+        } else if (mode === 'weekly_novel') {
+            return `Sözel muhakeme ve zihinsel dinlenme için devasa evrenleri olan; Yüzüklerin Efendisi, Game of Thrones, Malazan, Dune gibi çok katmanlı, epik fantastik veya bilim kurgu türünde SADECE 1 ADET rastgele kitap öner.\n\nÖnerini şık bir özetle sun. KESİNLİKLE metninin EN ALTINA tam olarak şu satırı ekle (başka hiçbir şey ekleme):\nKİTAP_SECILDI: [Kitap Adı] - [Yazarı]`;
+        } else if (mode === 'station_notes') {
+            return `Ders: ${stLesson}, Konu: ${stTopic}. Doğrudan bu sayısal konunun en kritik formüllerini ve ÖSYM'nin kesin sorar dediğin püf noktalarını net özet notlarla şık listeler halinde yaz.`;
+        } else if (mode === 'station_tactics') {
+            return `Ders: ${stLesson}, Konu: ${stTopic}. Bu sayısal konuyu en hızlı ve en kalıcı akılda tutma taktiklerini ver.`;
+        } else if (mode === 'station_focus') {
+            return `Masa başında odağı dağılan sayısal öğrencine 3 maddelik sarsıcı bir odaklanma stratejisi ver kral.`;
+        }
+    }
+
+    async function runLiveGeminiAI(mode) {
+        let outBox, cacheKey;
+        if (mode === 'weekly') { outBox = document.getElementById("aiOutput"); cacheKey = "yks_ai_cache_weekly"; }
+        else if (mode === 'question') { outBox = document.getElementById("aiQuestionOutput"); cacheKey = "yks_ai_cache_question"; }
+        else if (mode === 'books') { outBox = document.getElementById("aiBooksOutput"); cacheKey = "yks_ai_cache_books"; }
+        else if (mode === 'motivation') { outBox = document.getElementById("aiCultureOutput"); cacheKey = "yks_ai_cache_culture"; }
+        else if (mode === 'culture') { outBox = document.getElementById("aiCultureOutput"); cacheKey = "yks_ai_cache_culture"; }
+        else if (mode === 'weekly_novel') { outBox = document.getElementById("aiNovelOutput"); cacheKey = "yks_ai_cache_novel"; }
+        else if (mode.startsWith('station_')) { outBox = document.getElementById("aiStationOutput"); cacheKey = "yks_ai_cache_station"; }
+
+        let dynamicKey = localStorage.getItem("yks_panel_gemini_key") || document.getElementById("uiApiKeyInput").value.trim();
+        if (!dynamicKey) return alert("⚠️ API Anahtarı Bulunamadı! Key gir kral.");
+        if(outBox) outBox.innerHTML = "⚡ Sayısal koç 7 günlük tam haftalık programı hazırlıyor...";
+        
+        const promptText = compilePromptData(mode); let aiResult = "";
+        try {
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${dynamicKey}`, {
+                method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents: [{ parts: [{ text: promptText }] }] })
+            });
+            let finalDataObj = await response.json();
+            
+            if(finalDataObj.error) { if(outBox) outBox.innerHTML = `❌ API Hatası: ${finalDataObj.error.message}`; return; }
+            if (finalDataObj && finalDataObj.candidates && finalDataObj.candidates[0].content.parts[0].text) { aiResult = finalDataObj.candidates[0].content.parts[0].text; }
+        } catch (err) { console.error(err); }
+
+        if (aiResult) {
+            let visibleText = aiResult;
+            
+            if (mode === 'weekly') {
+                document.querySelectorAll('.schedule-cell-content').forEach(cell => {
+                    cell.innerText = "";
+                    localStorage.removeItem(`yks_matrix_${cell.id}`);
+                });
+
+                if (aiResult.includes("MATRIX_DATA_START")) {
+                    let segments = aiResult.split("MATRIX_DATA_START"); visibleText = segments[0].trim(); 
+                    if (segments[1] && segments[1].includes("MATRIX_DATA_END")) { let hiddenMatrix = segments[1].split("MATRIX_DATA_END")[0]; parseAndFillMatrixScheduleHidden(hiddenMatrix); }
+                }
+            }
+
+            if (mode === 'weekly_novel' && aiResult.includes("KİTAP_SECILDI:")) {
+                let parts = aiResult.split("KİTAP_SECILDI:"); visibleText = parts[0].trim();
+                if(parts.length > 1) {
+                    let bookName = parts[1].replace(/[\[\]\*]/g, '').trim(); let novelInput = document.getElementById("currentReadingNovelInput");
+                    if(novelInput) { novelInput.value = bookName; saveCurrentNovelState(); }
+                }
+            }
+            let htmlOutput = cleanMarkdownToHtml(visibleText); outBox.innerHTML = htmlOutput; localStorage.setItem(cacheKey, htmlOutput);
+        } else { if(outBox) outBox.innerHTML = "❌ Veri okunamadı. Tekrar bas kral."; }
+    }
+
+    function parseAndFillMatrixScheduleHidden(matrixText) {
+        if(!matrixText) return; const lines = matrixText.split("\n");
+        const hourMap = { 
+            "09:00 - 11:00": "b1", 
+            "11:15 - 13:15": "b2", 
+            "14:15 - 16:15": "b3", 
+            "16:30 - 18:30": "b4", 
+            "19:30 - 21:30": "b5", 
+            "21:45 - 23:30": "b6" 
+        };
+        lines.forEach(line => {
+            let trLine = line.trim(); if(!trLine || !trLine.includes("|")) return; let parts = trLine.split("|").map(p => p.trim());
+            if(parts.length >= 3) {
+                let rawHour = parts[0].replace(/\s+/g, " ").trim(); let g = parts[1].toLowerCase();
+                let gün = g.replace(/ı/g, "i").replace(/ş/g, "s").replace(/ç/g, "c").replace(/pazartesi/g, "pazartesi").replace(/salı/g, "sali").replace(/çarşamba/g, "carsamba").replace(/perşembe/g, "persembe").replace(/cuma/g, "cuma").replace(/cumartesi/g, "cumartesi").replace(/pazar/g, "pazar");
+                let icerik = parts.slice(2).join(" | "); let blokKod = hourMap[rawHour]; 
+                if(blokKod) { const cell = document.getElementById(`cell-${blokKod}-${gün}`); if(cell) { cell.innerText = icerik; localStorage.setItem(`yks_matrix_cell-${blokKod}-${gün}`, icerik); } }
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
